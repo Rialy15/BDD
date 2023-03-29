@@ -1,4 +1,5 @@
 drop table if exists compte;
+drop table if exists profil;
 
 
 create table compte (
