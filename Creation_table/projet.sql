@@ -1,73 +1,120 @@
 drop table if exists compte;
 drop table if exists profil;
-
+drop table if exists RDV;
+drop table if exists En_cours;
+drop table if exists Termines;
+drop table if exists Adresse;
+drop table if exists Loisir;
+drop table if exists Preference;
+drop table if exists Album;
+drop table if exists Photo;
+drop table if exists Premium;
+drop table if exists Classique;
+drop table if exists Fracture;
+drop table if exists Femme;
+drop table if exists Homme;
+drop table if exists conv;
+drop table if exists texto;
 
 create table compte (
-	C_id serial primary key,
-	compte_mail text not null);
+  C_id serial primary key,
+  compte_mail text not null);
 
 create table profil (
-	C_id serial primary key,
-	compte_mail text not null);
+	pid serial primary key,
+	compte_mail text not null,
+  nom text not null,
+  prenom text not null,
+  age integer not null);
  
-create table prendre_RDV (
- 
-);
+--Plus pratique sans cette table ooft
+-- create table prendre_RDV (
+-- );
 
+--Tout dans rdv directement
 create table RDV (
-  rdv_id serial primary key,
-  date date not null);
+  pid1 integer not null,
+  pid2 integer not null,
+  lieuRDV text not null,
+  dateRDV date,
+  primary key (pid1,lieuRDV,dateRDV),
+  foreign key (pid) references profil(pid));
   
 create table En_cours (
-  id_ad serial primary key);
+  id_ad serial primary key)
+  INHERITS (RDV);
   
 create table Termines (
-  fin date primary key);
+  fin date primary key)
+  INHERITS (RDV);
   
 create table Adresse (
-  ad_id serial primary key,
+  adr_id serial primary key,
   pays text,
   ville text,
+  codepostal int,
   rue text,
   num int
   );
-  
-create table Preference (
+
+
+--3 types de loisir par profil
+create table Loisir (
+  L1 text,
+  L2 text,
+  L3 text,
   );
 
-create table Loisir (
+create table Preference (
+  P1 text
+  P2 text
   );
   
 create table Album (
-album_id serial primary key,
-c_id int not null,
-album_date date NOT null
+  album_id serial primary key,
+  pid int not null,
+  album_date date NOT null
   );
 
 create table Photo (
-p_id serial primary key,
-album_id int not null,
-share_date date NOT null
+  ph_id serial primary key,
+  album_id int not null,
+  share_date date NOT null
   );
 
 create table Premium (
-c_id serial primary key,
-fin_abonnement date NOT null
-  );
+  c_id serial primary key,
+  fin_abonnement date NOT null
+  )
+  INHERITS (profil);
+
+create table Classique (
+  c_id serial primary key,
+  fin_abonnement date NOT null
+  )
+  INHERITS (profil);
 
 create table Fracture (
-date date
+  date_fac date
  );
 
 create table Femme (
   f_id serial primary key
- );
+ )INHERITS (profil);
+
 create table Homme (
   h_id serial primary key
+ )INHERITS (profil);
+
+create table conv (
+  conv_id serial primary key,
+  primary key (pid1,pid2)
  );
 
-create table conversation (
-  h_id serial primary key
+create table texto (
+  sms text,
+  date_sms date,
+  heure int
  );
 
 
