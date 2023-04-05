@@ -66,14 +66,17 @@ create table Adresse (
 
 
 create table Loisir (
+  pid int primary key,
   L1 text,
   L2 text,
   L3 text
   );
 
 create table Preference (
+  pid int primary key,
   P1 text,
-  P2 text
+  P2 text,
+  P3 text
   );
   
 create table Album (
@@ -93,7 +96,6 @@ create table Premium (
   fin_abonnement date NOT null,
   foreign KEY (ppid) REFERENCES profil(pid)
   )
-  --INHERITS (profil);
   ;
 
 create table Classique (
