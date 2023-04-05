@@ -1,6 +1,3 @@
-drop table if exists compte;
-drop table if exists profil;
-drop table if exists RDV;
 drop table if exists En_cours;
 drop table if exists Termines;
 drop table if exists Adresse;
@@ -15,6 +12,11 @@ drop table if exists Femme;
 drop table if exists Homme;
 drop table if exists conv;
 drop table if exists texto;
+drop table if exists rdv;
+drop table if exists profil;
+drop table if exists compte;
+
+
 
 create table compte (
   C_id serial primary key,
@@ -32,21 +34,22 @@ create table profil (
 -- );
 
 --Tout dans rdv directement
-create table RDV (
+create table rdv (
   pid1 integer not null,
   pid2 integer not null,
   lieuRDV text not null,
   dateRDV date,
-  primary key (pid1,lieuRDV,dateRDV),
-  foreign key (pid) references profil(pid));
+  primary key (pid1,lieuRDV,dateRDV)
+  --foreign key (pid) references profil(pid)
+  );
   
 create table En_cours (
   id_ad serial primary key)
-  INHERITS (RDV);
+  INHERITS (rdv);
   
 create table Termines (
   fin date primary key)
-  INHERITS (RDV);
+  INHERITS (rdv);
   
 create table Adresse (
   adr_id serial primary key,
@@ -62,11 +65,11 @@ create table Adresse (
 create table Loisir (
   L1 text,
   L2 text,
-  L3 text,
+  L3 text
   );
 
 create table Preference (
-  P1 text
+  P1 text,
   P2 text
   );
   
@@ -83,14 +86,16 @@ create table Photo (
   );
 
 create table Premium (
-  c_id serial primary key,
-  fin_abonnement date NOT null
+  ppid serial primary key,
+  fin_abonnement date NOT null,
+  foreign KEY (ppid) REFERENCES profil(pid)
   )
   INHERITS (profil);
 
 create table Classique (
-  c_id serial primary key,
-  fin_abonnement date NOT null
+  pcid serial primary key,
+  fin_abonnement date NOT null,
+  foreign KEY (pcid) REFERENCES profil(pid)
   )
   INHERITS (profil);
 
@@ -107,7 +112,8 @@ create table Homme (
  )INHERITS (profil);
 
 create table conv (
-  conv_id serial primary key,
+  pid1 integer not null,
+  pid2 integer not null,
   primary key (pid1,pid2)
  );
 
