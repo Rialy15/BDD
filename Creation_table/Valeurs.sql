@@ -31,13 +31,13 @@ INSERT INTO Adresse (pays, ville, codepostal, rue, num) VALUES
 ('Allemagne', 'Berlin', 10117, 'Unter den Linden', 50),
 ('Italie', 'Rome', 00186, 'Via dei Condotti', 60);
 
-INSERT INTO Loisir (L1, L2, L3) VALUES
-('Cinéma', 'Théâtre', 'Musique'),
-('Sport', 'Voyages', 'Lecture'),
-('Arts', 'Jeux vidéo', 'Cuisine'),
-('Photographie', 'Jardinage', 'Bricolage'),
-('Danse', 'Randonnée', 'Gastronomie'),
-('Informatique', 'Moto', 'Cuisine');
+INSERT INTO Loisir (pid, L1, L2, L3) VALUES
+(1,'Cinéma', 'Théâtre', 'Musique'),
+(2,'Sport', 'Voyages', 'Lecture'),
+(3,'Arts', 'Jeux vidéo', 'Cuisine'),
+(4,'Photographie', 'Jardinage', 'Bricolage'),
+(5,'Danse', 'Randonnée', 'Gastronomie'),
+(6,'Informatique', 'Moto', 'Cuisine');
 
 INSERT INTO Album (pid, album_date) VALUES
 (1, '2023-04-01'),
