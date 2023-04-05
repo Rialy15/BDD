@@ -103,15 +103,17 @@ INSERT INTO conv (pid1, pid2) VALUES
 (5, 6),
 (6, 4);
 
-INSERT INTO texto (sms, date_sms, heure) VALUES
-('Salut ça va ?', '2023-04-01', 10),
-('Oui et toi ?', '2023-04-01', 11),
-('Très bien merci', '2023-04-01', 12),
-('Je t''aime', '2023-04-02', 15),
-('Moi aussi', '2023-04-02', 16),
-('On se voit bientôt ?', '2023-04-03', 18);
+INSERT INTO texto (id_conv, sms, date_sms, heure) VALUES
+  (1, 'Hello, how are you?', '2022-03-31', 10),
+  (1, 'I am fine, thank you!', '2022-03-31', 11),
+  (1, 'Can we meet tomorrow?', '2022-04-01', 9),
+  (1, 'Sure, what time?', '2022-04-01', 10),
 
-INSERT INTO parrainage (pid_Parrain, pid_Parrainé, parrainage_date) VALUES
-(1, 2, '2023-04-01'),
-(3, 1, '2023-04-02'),
-(2, 3, '2023-04-03');
+  (2, 'Hola!', '2022-04-01', 10),
+
+  (3, 'Salut, jolie photo!', '2022-04-01', 11),
+  (3, 'Salut, merci!!!', '2022-04-02', 15),
+  (3, 'Seriez-vous libre pour un café demain?', '2022-04-02', 16);
+
+
+

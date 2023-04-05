@@ -10,8 +10,8 @@ drop table if exists Classique;
 drop table if exists Facture;
 drop table if exists Femme;
 drop table if exists Homme;
-drop table if exists conv;
 drop table if exists texto;
+drop table if exists conv;
 drop table if exists parrainage;
 drop table if exists rdv;
 drop table if exists profil;
@@ -117,12 +117,14 @@ create table Homme (
  )INHERITS (profil);
 
 create table conv (
+  id_conv serial primary key,
   pid1 integer not null,
-  pid2 integer not null,
-  primary key (pid1,pid2)
+  pid2 integer not null
  );
 
 create table texto (
+  id_texto serial primary key,
+  id_conv integer not null,
   sms text,
   date_sms date,
   heure int
