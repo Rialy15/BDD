@@ -112,4 +112,6 @@ INSERT INTO texto (sms, date_sms, heure) VALUES
 ('On se voit bientôt ?', '2023-04-03', 18);
 
 INSERT INTO parrainage (pid_Parrain, pid_Parrainé, parrainage_date) VALUES
-(1, 2, '2023-04-01');
+(1, 2, '2023-04-01'),
+(3, 1, '2023-04-02'),
+(2, 3, '2023-04-03');
