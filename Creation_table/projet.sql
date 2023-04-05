@@ -7,11 +7,12 @@ drop table if exists Album;
 drop table if exists Photo;
 drop table if exists Premium;
 drop table if exists Classique;
-drop table if exists Fracture;
+drop table if exists Facture;
 drop table if exists Femme;
 drop table if exists Homme;
 drop table if exists conv;
 drop table if exists texto;
+drop table if exists parrainage;
 drop table if exists rdv;
 drop table if exists profil;
 drop table if exists compte;
@@ -29,20 +30,23 @@ create table profil (
   prenom text not null,
   age integer not null);
  
---Plus pratique sans cette table ooft
--- create table prendre_RDV (
--- );
 
---Tout dans rdv directement
 create table rdv (
   pid1 integer not null,
   pid2 integer not null,
   lieuRDV text not null,
   dateRDV date,
   primary key (pid1,lieuRDV,dateRDV)
-  --foreign key (pid) references profil(pid)
   );
   
+create table parrainage (
+  pid_Parrain integer not null,
+  pid_Parrainé integer not null,
+  parrainage_date date NOT null,
+  primary key (pid_Parrain,pid_Parrainé)
+  );
+
+
 create table En_cours (
   id_ad serial primary key)
   INHERITS (rdv);
@@ -61,7 +65,6 @@ create table Adresse (
   );
 
 
---3 types de loisir par profil
 create table Loisir (
   L1 text,
   L2 text,
@@ -90,16 +93,16 @@ create table Premium (
   fin_abonnement date NOT null,
   foreign KEY (ppid) REFERENCES profil(pid)
   )
-  INHERITS (profil);
+  --INHERITS (profil);
+  ;
 
 create table Classique (
   pcid serial primary key,
   fin_abonnement date NOT null,
   foreign KEY (pcid) REFERENCES profil(pid)
-  )
-  INHERITS (profil);
+  );
 
-create table Fracture (
+create table Facture (
   date_fac date
  );
 
@@ -122,8 +125,4 @@ create table texto (
   date_sms date,
   heure int
  );
-
-
-
-
-    
+  
