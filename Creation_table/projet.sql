@@ -36,7 +36,7 @@ create table rdv (
   pid2 integer not null,
   lieuRDV text not null,
   dateRDV date,
-  primary key (pid1,lieuRDV,dateRDV)
+  primary key (pid1,pid2,lieuRDV,dateRDV)
   );
   
 create table parrainage (

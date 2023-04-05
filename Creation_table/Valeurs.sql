@@ -114,6 +114,3 @@ INSERT INTO texto (id_conv, sms, date_sms, heure) VALUES
   (3, 'Salut, jolie photo!', '2022-04-01', 11),
   (3, 'Salut, merci!!!', '2022-04-02', 15),
   (3, 'Seriez-vous libre pour un café demain?', '2022-04-02', 16);
-
-
-
