@@ -17,7 +17,7 @@ WHERE p.pid IN (
     WHERE l2.pid = [profil ID pour "Doe%"]
     AND l1.L1 = l2.L1 OR l1.L2 = l2.L2 OR l1.L3 = l2.L3
   )
-)
+);
 
 SELECT nom, prenom, age 
 FROM profil 
