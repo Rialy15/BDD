@@ -1,21 +1,22 @@
-drop table if exists En_cours;
-drop table if exists Termines;
-drop table if exists Adresse;
-drop table if exists Loisir;
-drop table if exists Preference;
-drop table if exists Album;
-drop table if exists Photo;
-drop table if exists Premium;
-drop table if exists Classique;
-drop table if exists Facture;
-drop table if exists Femme;
-drop table if exists Homme;
-drop table if exists texto;
-drop table if exists conv;
-drop table if exists parrainage;
-drop table if exists rdv;
-drop table if exists profil;
-drop table if exists compte;
+drop table if exists En_cours cascade;
+drop table if exists Termines cascade;
+drop table if exists Adresse cascade;
+drop table if exists Loisir cascade;
+drop table if exists Preference cascade;
+drop table if exists Album cascade;
+drop table if exists Photo cascade;
+drop table if exists Premium cascade;
+drop table if exists Classique cascade;
+drop table if exists Facture cascade;
+drop table if exists Femme cascade;
+drop table if exists Homme cascade;
+drop table if exists texto cascade;
+drop table if exists conv cascade;
+drop table if exists parrainage cascade;
+drop table if exists compte cascade;
+drop table if exists rdv cascade;
+drop table if exists profil cascade;
+
 
 
 
@@ -52,7 +53,7 @@ create table En_cours (
   INHERITS (rdv);
   
 create table Termines (
-  fin date primary key)
+  fin date)
   INHERITS (rdv);
   
 create table Adresse (
@@ -129,4 +130,4 @@ create table texto (
   date_sms date,
   heure int
  );
-  
+ 
