@@ -1,5 +1,4 @@
 --Requêtes
---Requêtes
 DROP TRIGGER check_age_trigger ON profil;
 DROP TRIGGER add_timestamp_trigger ON texto;
 DROP TRIGGER check_rdv_termines_trigger ON En_cours;
@@ -20,7 +19,7 @@ DROP VIEW total_rdv_par_utilisateur;
 
 
 -- Trouver les utilisateurs qui ont des loisirs similaires à l'utilisateur ayant pid = 1
-SELECT p.pid, p.nom, p.prenom
+SELECT p.nom, p.prenom
 FROM profil p
 WHERE EXISTS (
     SELECT 1
@@ -220,4 +219,3 @@ CREATE TRIGGER update_age_trigger
   BEFORE INSERT OR UPDATE OF date_naissance ON profil
   FOR EACH ROW
   EXECUTE FUNCTION update_age();
-
