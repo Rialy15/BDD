@@ -141,15 +141,15 @@ INSERT INTO En_cours (pid1, pid2, lieuRDV, dateRDV) VALUES
 (1, 2, 'Café de la Place', '2023-04-05'),
 (2, 3, 'Bar du Coin', '2023-04-06'),
 (3, 4, 'Restaurant Le Gourmet', '2023-04-07'),
-(4, 5, 'Chez Léa', '2023-04-10'),
-(5, 6, 'Biergarten', '2023-04-09');
+(4, 2, 'Chez Léa', '2023-04-10'),
+(5, 1, 'Biergarten', '2023-04-09');
 
 INSERT INTO Termines (pid1, pid2, lieuRDV, dateRDV, fin) VALUES
-(6, 1, 'Trattoria', '2023-03-10', '2023-03-10'),
+(2, 1, 'Trattoria', '2023-03-10', '2023-03-10'),
 (1, 3, 'Pizzeria', '2023-03-11', '2023-03-11'),
 (2, 4, 'Sushi Bar', '2023-03-12', '2023-03-12'),
 (3, 5, 'Boulangerie', '2023-03-13', '2023-03-13'),
-(4, 6, 'Brasserie', '2023-03-14', '2023-03-14');
+(4, 5, 'Brasserie', '2023-03-14', '2023-03-14');
 
 INSERT INTO signalement (pid_signalé, pid_signaleur, date_s) VALUES
 (1, 2, '2023-04-01'),
