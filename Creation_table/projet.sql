@@ -6,7 +6,6 @@ drop table if exists Preference cascade;
 drop table if exists Album cascade;
 drop table if exists Photo cascade;
 drop table if exists Premium cascade;
-drop table if exists Classique cascade;
 drop table if exists Facture cascade;
 drop table if exists Femme cascade;
 drop table if exists Homme cascade;
@@ -16,8 +15,7 @@ drop table if exists parrainage cascade;
 drop table if exists compte cascade;
 drop table if exists rdv cascade;
 drop table if exists profil cascade;
-
-drop table if exists signalement;
+drop table if exists signalement cascade;
 
 
 
@@ -36,8 +34,7 @@ create table profil (
 create table signalement (
   pid_signalé integer not null,
   pid_signaleur integer not null,
-  date_s date,
-  primary key(pid_signalé, pid_signaleur, date_s)
+  date_s date 
 );
  
 create table rdv (
@@ -106,12 +103,6 @@ create table Premium (
   foreign KEY (ppid) REFERENCES profil(pid)
   )
   ;
-
-create table Classique (
-  pcid serial primary key,
-  --fin_abonnement date NOT null,
-  foreign KEY (pcid) REFERENCES profil(pid)
-  );
 
 create table Facture (
   date_fac date
