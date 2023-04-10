@@ -129,4 +129,3 @@ create table texto (
   date_sms date,
   heure int
  );
- 
