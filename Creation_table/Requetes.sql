@@ -106,7 +106,7 @@ LEFT JOIN Album a ON p.pid = a.pid
 LEFT JOIN Photo ph ON a.album_id = ph.album_id;
 
 
---FULL OUTER JOIN:
+--FULL OUTER JOIN: Montrer tous les profils et leurs adresses correspondantes
 SELECT p.pid, p.nom, p.prenom, a.adr_id, a.pays, a.ville, a.rue, a.codepostal, a.num
 FROM profil p
 FULL OUTER JOIN Adresse a ON p.pid = a.adr_id;
@@ -129,6 +129,11 @@ JOIN profil p1 ON rdv.pid1 = p1.pid
 JOIN profil p2 ON rdv.pid2 = p2.pid
 WHERE rdv.dateRDV >= CURRENT_DATE;
 
+--Test de vue : Rendez-vous de tous les John
+SELECT * FROM rdv_a_venir
+WHERE prenom1 = 'John' OR prenom2 = 'John';
+
+
 --Vue : nombre total de rendez-vous par utilisateur
 
 CREATE VIEW total_rdv_par_utilisateur AS
@@ -140,6 +145,9 @@ FROM (
 ) AS rdv_union
 GROUP BY pid;
 
+--Test de vue : Personnes ayant plusieurs rendez-vous
+SELECT * FROM total_rdv_par_utilisateur
+WHERE total_rdv > 1;
 
 
 --vérifier l'âge avant d'insérer ou de mettre à jour un profil
