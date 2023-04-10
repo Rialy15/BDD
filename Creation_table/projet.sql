@@ -17,6 +17,8 @@ drop table if exists compte cascade;
 drop table if exists rdv cascade;
 drop table if exists profil cascade;
 
+drop table if exists signalement;
+
 
 
 
@@ -30,8 +32,14 @@ create table profil (
   nom text not null,
   prenom text not null,
   age integer not null);
- 
 
+create table signalement (
+  pid_signalé integer not null,
+  pid_signaleur integer not null,
+  date_s date,
+  primary key(pid_signalé, pid_signaleur, date_s)
+);
+ 
 create table rdv (
   pid1 integer not null,
   pid2 integer not null,
@@ -43,7 +51,7 @@ create table rdv (
 create table parrainage (
   pid_Parrain integer not null,
   pid_Parrainé integer not null,
-  parrainage_date date NOT null,
+  parrainage_date date not null,
   primary key (pid_Parrain,pid_Parrainé)
   );
 
@@ -101,7 +109,7 @@ create table Premium (
 
 create table Classique (
   pcid serial primary key,
-  fin_abonnement date NOT null,
+  --fin_abonnement date NOT null,
   foreign KEY (pcid) REFERENCES profil(pid)
   );
 
