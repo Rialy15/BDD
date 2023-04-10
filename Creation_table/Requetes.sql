@@ -1,36 +1,45 @@
 --Requêtes
+--Requêtes
+DROP TRIGGER check_age_trigger ON profil;
+DROP TRIGGER add_timestamp_trigger ON texto;
+DROP TRIGGER check_rdv_termines_trigger ON En_cours;
+DROP TRIGGER create_facture_trigger ON Premium;
+DROP TRIGGER update_age_trigger ON profil;
 
--- récupère tous les profils qui ont au moins un loisir en commun 
--- avec le profil dont le nom commence par "Doe". 
--- La sous-requête trouve tous les profils qui ont un loisir en commun 
--- avec le profil "Doe", puis la requête principale récupère 
--- les noms et prénoms correspondants.
 
-SELECT p.nom, p.prenom
+DROP FUNCTION check_age();
+DROP FUNCTION add_timestamp();
+DROP FUNCTION check_rdv_termines();
+DROP FUNCTION create_facture();
+DROP FUNCTION update_age();
+
+
+DROP VIEW rdv_a_venir;
+DROP VIEW total_rdv_par_utilisateur;
+
+
+
+-- Trouver les utilisateurs qui ont des loisirs similaires à l'utilisateur ayant pid = 1
+SELECT p.pid, p.nom, p.prenom
 FROM profil p
-WHERE p.pid IN (
-  SELECT l1.pid
-  FROM Loisir l1
-  WHERE EXISTS (
+WHERE EXISTS (
     SELECT 1
-    FROM Loisir l2
-    WHERE l2.pid = [profil ID pour "Doe%"]
-    AND l1.L1 = l2.L1 OR l1.L2 = l2.L2 OR l1.L3 = l2.L3
-  )
+    FROM Loisir l1
+    WHERE l1.pid = p.pid AND (
+        l1.L1 IN (SELECT L1 FROM Loisir WHERE pid = 1)
+        OR l1.L2 IN (SELECT L1 FROM Loisir WHERE pid = 1)
+        OR l1.L3 IN (SELECT L1 FROM Loisir WHERE pid = 1)
+    )
 );
 
+-- Nom, prenom, age des personnes ayant un age supérieur que celui moyen
 SELECT nom, prenom, age 
 FROM profil 
 WHERE age > (SELECT AVG(age) FROM profil);
 
----
--- Cette requête retourne les noms et prénoms de deux profils ayant eu un rendez-vous dans un lieu donné (qui a été terminé) au cours de l'année 2022 et qui ont un lien de parrainage (le premier profil est le filleul du parrain du deuxième profil).
 
--- Les deux sous-requêtes sont :
 
--- SELECT lieurdv FROM Termines WHERE fin BETWEEN '2022-01-01' AND '2022-12-31' : qui retourne tous les lieux de rendez-vous qui ont été terminés au cours de l'année 2022.
--- SELECT pid_Parrainé FROM parrainage WHERE pid_Parrain = (SELECT pid_Parrain FROM parrainage WHERE pid_Parrainé = r.pid1) : qui retourne l'identifiant du profil parrainé ayant le même parrain que le profil pid1 de la table rdv. Cette sous-requête est utilisée dans la clause WHERE pour filtrer les rendez-vous en fonction des liens de parrainage.
-
+--
 SELECT 
     p1.prenom AS prenom1, p1.nom AS nom1, p2.prenom AS prenom2, p2.nom AS nom2
 FROM 
@@ -51,8 +60,7 @@ WHERE
         )
     );
 
--- Cette requête utilise deux sous-requêtes imbriquées dans une clause WHERE. La première sous-requête sélectionne tous les utilisateurs ayant un compte premium en utilisant la table Premium et la jointure sur la table profil. La seconde sous-requête sélectionne tous les utilisateurs ayant des préférences en commun avec un utilisateur spécifié en comparant les colonnes P1, P2 et P3 de la table Preference 
--- avec celles de l'utilisateur spécifié. La requête globale renvoie les noms des utilisateurs qui répondent aux deux critères.
+-- profils Premium qui ont des préférences similaires à pid =3
 SELECT p.nom
 FROM profil p
 WHERE EXISTS (
@@ -66,60 +74,150 @@ WHERE EXISTS (
   AND EXISTS (
     SELECT *
     FROM Preference pref2
-    WHERE pref2.pid = <utilisateur_specifié>
+    WHERE pref2.pid = 3
     AND pref.P1 = pref2.P1 OR pref.P2 = pref2.P2 OR pref.P3 = pref2.P3
   )
 );
 
 
----Partie de Paul
+--Partie de Paul
+-- INNER JOIN: Liste des utilisateurs avec leurs adresses :
+SELECT p.pid, p.nom, p.prenom, a.pays, a.ville, a.rue, a.codepostal, a.num
+FROM profil p
+JOIN Adresse a ON p.pid = a.adr_id;
 
 
-SELECT compte.compte_mail, profil.nom, profil.prenom, profil.age
-FROM compte
-INNER JOIN profil ON compte.C_id = profil.C_id;
-
-SELECT compte.compte_mail, prendre_RDV.lieuRDV, prendre_RDV.dateRDV
-FROM compte
-LEFT JOIN prendre_RDV ON compte.C_id = prendre_RDV.C_id;
-
-SELECT prendre_RDV.pid, RDV.lieuRDV, RDV.dateRDV
-FROM prendre_RDV
-RIGHT JOIN RDV ON prendre_RDV.pid = RDV.pid;
-
-SELECT compte.compte_mail, prendre_RDV.lieuRDV, RDV.dateRDV
-FROM compte
-FULL OUTER JOIN prendre_RDV ON compte.C_id = prendre_RDV.C_id
-FULL OUTER JOIN RDV ON prendre_RDV.pid = RDV.pid;
-
-SELECT a.adr_id, a.rue, b.adr_id, b.rue
-FROM Adresse a
-INNER JOIN Adresse b ON a.adr_id <> b.adr_id
-WHERE a.rue = b.rue;
+--LEFT JOIN: Liste des utilisateurs et leurs loisirs, même s'ils n'ont pas de loisirs enregistrés :
+SELECT p.pid, p.nom, p.prenom, l.L1, l.L2, l.L3
+FROM profil p
+LEFT JOIN Loisir l ON p.pid = l.pid;
 
 
-CREATE VIEW vue_persistante AS
-SELECT compte.compte_mail, profil.nom, profil.prenom, profil.age
-FROM compte
-INNER JOIN profil ON compte.C_id = profil.C_id;
-
-CREATE OR REPLACE TEMP VIEW vue_temporaire AS
-SELECT compte.compte_mail, prendre_RDV.lieuRDV, RDV.dateRDV
-FROM compte
-FULL OUTER JOIN prendre_RDV ON compte.C_id = prendre_RDV.C_id
-FULL OUTER JOIN RDV ON prendre_RDV.pid = RDV.pid;
+--RIGHT JOIN: Liste des rendez-vous en cours avec les informations des deux utilisateurs, y compris ceux qui n'ont pas de rendez-vous en cours :
+SELECT e.id_ad, p1.pid AS pid1, p1.nom AS nom1, p1.prenom AS prenom1, p2.pid AS pid2, p2.nom AS nom2, p2.prenom AS prenom2, e.lieuRDV, e.dateRDV
+FROM profil p1
+JOIN En_cours e ON p1.pid = e.pid1
+RIGHT JOIN profil p2 ON e.pid2 = p2.pid;
 
 
-SELECT compte_mail, COUNT(nom) AS nb_profil
-FROM vue_persistante
-GROUP BY compte_mail;
+--INNER et LEFT: Liste des utilisateurs, leurs albums, et les photos partagées, même s'ils n'ont pas d'albums ou de photos :
+SELECT p.pid, p.nom, p.prenom, a.album_id, a.album_date, ph.ph_id, ph.share_date
+FROM profil p
+LEFT JOIN Album a ON p.pid = a.pid
+LEFT JOIN Photo ph ON a.album_id = ph.album_id;
 
-SELECT compte_mail, lieuRDV, dateRDV
-FROM vue_temporaire
-WHERE lieuRDV IS NOT NULL;
 
-SELECT compte_mail, 'compte' AS type
-FROM compte
-UNION
-SELECT compte_mail, 'profil' AS type
-FROM profil;
+--FULL OUTER JOIN:
+SELECT p.pid, p.nom, p.prenom, a.adr_id, a.pays, a.ville, a.rue, a.codepostal, a.num
+FROM profil p
+FULL OUTER JOIN Adresse a ON p.pid = a.adr_id;
+
+
+--UNION :Liste de tous les rendez-vous (terminés et en cours)
+SELECT pid1, pid2, lieuRDV, dateRDV
+FROM En_cours
+UNION ALL
+SELECT pid1, pid2, lieuRDV, dateRDV
+FROM Termines
+ORDER BY dateRDV;
+
+--Vue : liste des rendez-vous à venir par utilisateur
+ 
+CREATE VIEW rdv_a_venir AS
+SELECT p1.nom AS nom1, p1.prenom AS prenom1, p2.nom AS nom2, p2.prenom AS prenom2, rdv.lieuRDV, rdv.dateRDV
+FROM rdv
+JOIN profil p1 ON rdv.pid1 = p1.pid
+JOIN profil p2 ON rdv.pid2 = p2.pid
+WHERE rdv.dateRDV >= CURRENT_DATE;
+
+--Vue : nombre total de rendez-vous par utilisateur
+
+CREATE VIEW total_rdv_par_utilisateur AS
+SELECT pid, COUNT(*) AS total_rdv
+FROM (
+    SELECT pid1 AS pid FROM rdv
+    UNION ALL
+    SELECT pid2 AS pid FROM rdv
+) AS rdv_union
+GROUP BY pid;
+
+
+
+--vérifier l'âge avant d'insérer ou de mettre à jour un profil
+
+CREATE OR REPLACE FUNCTION check_age() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.age < 18 THEN
+    RAISE EXCEPTION 'L''âge doit être supérieur ou égal à 18';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_age_trigger
+  BEFORE INSERT OR UPDATE ON profil
+  FOR EACH ROW
+  EXECUTE FUNCTION check_age();
+
+--ajouter un timestamp lors de l'insertion d'un message dans la table texto
+ 
+CREATE OR REPLACE FUNCTION add_timestamp() RETURNS TRIGGER AS $$
+BEGIN
+  NEW.heure = EXTRACT(HOUR FROM CURRENT_TIME);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER add_timestamp_trigger
+  BEFORE INSERT ON texto
+  FOR EACH ROW
+  EXECUTE FUNCTION add_timestamp();
+  
+--marquer les rendez-vous comme terminés
+ 
+CREATE OR REPLACE FUNCTION check_rdv_termines() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.dateRDV < CURRENT_DATE THEN
+    INSERT INTO Termines (pid1, pid2, lieuRDV, dateRDV, fin) VALUES (NEW.pid1, NEW.pid2, NEW.lieuRDV, NEW.dateRDV, CURRENT_DATE);
+    DELETE FROM En_cours WHERE id_ad = NEW.id_ad;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_rdv_termines_trigger
+  AFTER INSERT OR UPDATE ON En_cours
+  FOR EACH ROW
+  EXECUTE FUNCTION check_rdv_termines();
+  
+--Ajouter une nouvelle ligne dans la table Facture lorsqu'un profil Premium est créé:
+
+CREATE OR REPLACE FUNCTION create_facture()
+  RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO Facture (date_fac) VALUES (NEW.fin_abonnement);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_facture_trigger
+  AFTER INSERT ON Premium
+  FOR EACH ROW
+  EXECUTE FUNCTION create_facture();
+  
+-- mettre à jour le age d'un profil après une modification
+CREATE OR REPLACE FUNCTION update_age()
+  RETURNS TRIGGER AS $$
+BEGIN
+  NEW.age = EXTRACT(YEAR FROM age(NEW.date_naissance));
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE profil ADD COLUMN date_naissance DATE;
+
+CREATE TRIGGER update_age_trigger
+  BEFORE INSERT OR UPDATE OF date_naissance ON profil
+  FOR EACH ROW
+  EXECUTE FUNCTION update_age();
+

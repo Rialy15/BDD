@@ -1,3 +1,22 @@
+DELETE FROM compte;
+DELETE FROM profil;
+DELETE FROM rdv;
+DELETE FROM Adresse;
+DELETE FROM Loisir;
+DELETE FROM Album;
+DELETE FROM Photo;
+DELETE FROM Premium;
+DELETE FROM Classique;
+DELETE FROM Facture;
+DELETE FROM Femme;
+DELETE FROM Homme;
+DELETE FROM conv;
+DELETE FROM texto;
+DELETE FROM Preference;
+DELETE FROM En_cours;
+DELETE FROM Termines;
+
+
 ----------REMPLISSAGE
 INSERT INTO compte (compte_mail) VALUES
 ('compte1@mail.com'),
@@ -16,12 +35,12 @@ INSERT INTO profil (compte_mail, nom, prenom, age) VALUES
 ('compte6@mail.com', 'Müller', 'Hans', 50);
 
 INSERT INTO rdv (pid1, pid2, lieuRDV, dateRDV) VALUES
-(1, 2, 'Café de la Place', '2023-04-05'),
-(2, 3, 'Bar du Coin', '2023-04-06'),
+(1, 2, 'Café de la Place', '2023-07-06'),
+(2, 1, 'Bar du Coin', '2023-07-06'),
 (3, 1, 'Restaurant Le Gourmet', '2023-04-07'),
-(4, 5, 'Chez Léa', '2023-04-08'),
+(2, 5, 'Chez Léa', '2023-04-11'),
 (5, 6, 'Biergarten', '2023-04-09'),
-(6, 4, 'Trattoria', '2023-04-10');
+(6, 1, 'Trattoria', '2023-04-10');
 
 INSERT INTO Adresse (pays, ville, codepostal, rue, num) VALUES
 ('France', 'Paris', 75001, 'Rue de Rivoli', 10),
@@ -114,3 +133,23 @@ INSERT INTO texto (id_conv, sms, date_sms, heure) VALUES
   (3, 'Salut, jolie photo!', '2022-04-01', 11),
   (3, 'Salut, merci!!!', '2022-04-02', 15),
   (3, 'Seriez-vous libre pour un café demain?', '2022-04-02', 16);
+  
+  INSERT INTO Preference (pid, P1, P2, P3) VALUES
+(1, 'Cinéma', 'Sport', 'Voyage'),
+(2, 'Sport', 'Musique', 'Cuisine'),
+(3, 'Sport', 'Lecture', 'Cuisine'),
+(4, 'Voyage', 'Cuisine', 'Musique');
+
+INSERT INTO En_cours (pid1, pid2, lieuRDV, dateRDV) VALUES
+(1, 2, 'Café de la Place', '2023-04-05'),
+(2, 3, 'Bar du Coin', '2023-04-06'),
+(3, 4, 'Restaurant Le Gourmet', '2023-04-07'),
+(4, 5, 'Chez Léa', '2023-04-10'),
+(5, 6, 'Biergarten', '2023-04-09');
+
+INSERT INTO Termines (pid1, pid2, lieuRDV, dateRDV, fin) VALUES
+(6, 1, 'Trattoria', '2023-03-10', '2023-03-10'),
+(1, 3, 'Pizzeria', '2023-03-11', '2023-03-11'),
+(2, 4, 'Sushi Bar', '2023-03-12', '2023-03-12'),
+(3, 5, 'Boulangerie', '2023-03-13', '2023-03-13'),
+(4, 6, 'Brasserie', '2023-03-14', '2023-03-14');
