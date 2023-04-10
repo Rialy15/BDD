@@ -1,155 +1,221 @@
-DELETE FROM compte;
-DELETE FROM profil;
-DELETE FROM rdv;
-DELETE FROM Adresse;
-DELETE FROM Loisir;
-DELETE FROM Album;
-DELETE FROM Photo;
-DELETE FROM Premium;
-DELETE FROM Classique;
-DELETE FROM Facture;
-DELETE FROM Femme;
-DELETE FROM Homme;
-DELETE FROM conv;
-DELETE FROM texto;
-DELETE FROM Preference;
-DELETE FROM En_cours;
-DELETE FROM Termines;
+--Requêtes
+DROP TRIGGER check_age_trigger ON profil;
+DROP TRIGGER add_timestamp_trigger ON texto;
+DROP TRIGGER check_rdv_termines_trigger ON En_cours;
+DROP TRIGGER create_facture_trigger ON Premium;
+DROP TRIGGER update_age_trigger ON profil;
 
 
-----------REMPLISSAGE
-INSERT INTO compte (compte_mail) VALUES
-('compte1@mail.com'),
-('compte2@mail.com'),
-('compte3@mail.com'),
-('compte4@mail.com'),
-('compte5@mail.com'),
-('compte6@mail.com');
+DROP FUNCTION check_age();
+DROP FUNCTION add_timestamp();
+DROP FUNCTION check_rdv_termines();
+DROP FUNCTION create_facture();
+DROP FUNCTION update_age();
 
-INSERT INTO profil (compte_mail, nom, prenom, age) VALUES
-('compte1@mail.com', 'Doe', 'John', 30),
-('compte2@mail.com', 'Smith', 'Jane', 25),
-('compte3@mail.com', 'Johnson', 'Michael', 40),
-('compte4@mail.com', 'Garcia', 'Maria', 22),
-('compte5@mail.com', 'Kowalski', 'Piotr', 27),
-('compte6@mail.com', 'Müller', 'Hans', 50);
 
-INSERT INTO rdv (pid1, pid2, lieuRDV, dateRDV) VALUES
-(1, 2, 'Café de la Place', '2023-07-06'),
-(2, 1, 'Bar du Coin', '2023-07-06'),
-(3, 1, 'Restaurant Le Gourmet', '2023-04-07'),
-(2, 5, 'Chez Léa', '2023-04-11'),
-(5, 6, 'Biergarten', '2023-04-09'),
-(6, 1, 'Trattoria', '2023-04-10');
+DROP VIEW rdv_a_venir;
+DROP VIEW total_rdv_par_utilisateur;
 
-INSERT INTO Adresse (pays, ville, codepostal, rue, num) VALUES
-('France', 'Paris', 75001, 'Rue de Rivoli', 10),
-('Belgique', 'Bruxelles', 1000, 'Avenue Louise', 20),
-('Canada', 'Montréal', 11290, 'Rue Sainte-Catherine', 30),
-('Espagne', 'Barcelone', 08001, 'Carrer de la Boqueria', 40),
-('Allemagne', 'Berlin', 10117, 'Unter den Linden', 50),
-('Italie', 'Rome', 00186, 'Via dei Condotti', 60);
 
-INSERT INTO Loisir (pid, L1, L2, L3) VALUES
-(1,'Cinéma', 'Théâtre', 'Musique'),
-(2,'Sport', 'Voyages', 'Lecture'),
-(3,'Arts', 'Jeux vidéo', 'Cuisine'),
-(4,'Photographie', 'Jardinage', 'Bricolage'),
-(5,'Danse', 'Randonnée', 'Gastronomie'),
-(6,'Informatique', 'Moto', 'Cuisine');
 
-INSERT INTO Album (pid, album_date) VALUES
-(1, '2023-04-01'),
-(2, '2023-04-02'),
-(3, '2023-04-03'),
-(4, '2023-04-04'),
-(5, '2023-04-05'),
-(6, '2023-04-06');
+-- Trouver les utilisateurs qui ont des loisirs similaires à l'utilisateur ayant pid = 1
+SELECT p.nom, p.prenom
+FROM profil p
+WHERE EXISTS (
+    SELECT 1
+    FROM Loisir l1
+    WHERE l1.pid = p.pid AND (
+        l1.L1 IN (SELECT L1 FROM Loisir WHERE pid = 1)
+        OR l1.L2 IN (SELECT L1 FROM Loisir WHERE pid = 1)
+        OR l1.L3 IN (SELECT L1 FROM Loisir WHERE pid = 1)
+    )
+);
 
-INSERT INTO Photo (album_id, share_date) VALUES
-(1, '2023-04-01'),
-(2, '2023-04-02'),
-(3, '2023-04-03'),
-(4, '2023-04-04'),
-(5, '2023-04-05'),
-(6, '2023-04-06');
+-- Nom, prenom, age des personnes ayant un age supérieur que celui moyen
+SELECT nom, prenom, age 
+FROM profil 
+WHERE age > (SELECT AVG(age) FROM profil);
 
-INSERT INTO Premium (ppid, fin_abonnement) VALUES
-(1, '2024-04-01'),
-(2, '2024-04-02'),
-(3, '2024-04-03'),
-(4, '2025-04-04'),
-(5, '2025-04-05'),
-(6, '2025-04-06');
 
-INSERT INTO Classique (pcid, fin_abonnement) VALUES
-(1, '2023-04-01'),
-(2, '2023-04-02'),
-(3, '2023-04-03'),
-(4, '2023-04-04'),
-(5, '2023-04-05'),
-(6, '2023-04-06');
 
-INSERT INTO Facture (date_fac) VALUES
-('2023-04-01'),
-('2023-04-02'),
-('2023-04-03'),
-('2023-04-04'),
-('2023-04-05'),
-('2023-04-06');
+--
+SELECT 
+    p1.prenom AS prenom1, p1.nom AS nom1, p2.prenom AS prenom2, p2.nom AS nom2
+FROM 
+    rdv r 
+    JOIN profil p1 ON r.pid1 = p1.pid
+    JOIN profil p2 ON r.pid2 = p2.pid
+WHERE 
+    r.lieurdv IN (
+        SELECT lieurdv FROM Termines
+        WHERE fin BETWEEN '2022-01-01' AND '2022-12-31'
+    )
+    AND 
+    r.pid1 IN (
+        SELECT pid_Parrainé FROM parrainage 
+        WHERE pid_Parrain = (
+            SELECT pid_Parrain FROM parrainage 
+            WHERE pid_Parrainé = r.pid1
+        )
+    );
 
-INSERT INTO Femme (compte_mail, nom, prenom, age) VALUES
-('compte1@mail.com', 'Dupont', 'Marie', 28),
-('compte2@mail.com', 'Garcia', 'Sophie', 32),
-('compte3@mail.com', 'Leroy', 'Nathalie', 35),
-('compte4@mail.com', 'Martinez', 'Isabelle', 24),
-('compte5@mail.com', 'Nowak', 'Anna', 29),
-('compte6@mail.com', 'Schmidt', 'Monika', 55);
+-- profils Premium qui ont des préférences similaires à pid =3
+SELECT p.nom
+FROM profil p
+WHERE EXISTS (
+  SELECT *
+  FROM Premium pr
+  WHERE p.pid = pr.ppid
+) AND EXISTS (
+  SELECT *
+  FROM Preference pref
+  WHERE pref.pid = p.pid
+  AND EXISTS (
+    SELECT *
+    FROM Preference pref2
+    WHERE pref2.pid = 3
+    AND pref.P1 = pref2.P1 OR pref.P2 = pref2.P2 OR pref.P3 = pref2.P3
+  )
+);
 
-INSERT INTO Homme (compte_mail, nom, prenom, age) VALUES
-('homme1@mail.com', 'Martin', 'Jean', 35),
-('homme2@mail.com', 'Durand', 'Pierre', 28),
-('homme3@mail.com', 'Lefebvre', 'Nicolas', 42),
-('homme4@mail.com', 'Wojciechowski', 'Adam', 23),
-('homme5@mail.com', 'Müller', 'Hans', 39),
-('homme6@mail.com', 'Kowalski', 'Tomasz', 43);
 
-INSERT INTO conv (pid1, pid2) VALUES
-(1, 2),
-(2, 3),
-(3, 1),
-(4, 5),
-(5, 6),
-(6, 4);
+--Partie de Paul
+-- INNER JOIN: Liste des utilisateurs avec leurs adresses :
+SELECT p.pid, p.nom, p.prenom, a.pays, a.ville, a.rue, a.codepostal, a.num
+FROM profil p
+JOIN Adresse a ON p.pid = a.adr_id;
 
-INSERT INTO texto (id_conv, sms, date_sms, heure) VALUES
-  (1, 'Hello, how are you?', '2022-03-31', 10),
-  (1, 'I am fine, thank you!', '2022-03-31', 11),
-  (1, 'Can we meet tomorrow?', '2022-04-01', 9),
-  (1, 'Sure, what time?', '2022-04-01', 10),
 
-  (2, 'Hola!', '2022-04-01', 10),
+--LEFT JOIN: Liste des utilisateurs et leurs loisirs, même s'ils n'ont pas de loisirs enregistrés :
+SELECT p.pid, p.nom, p.prenom, l.L1, l.L2, l.L3
+FROM profil p
+LEFT JOIN Loisir l ON p.pid = l.pid;
 
-  (3, 'Salut, jolie photo!', '2022-04-01', 11),
-  (3, 'Salut, merci!!!', '2022-04-02', 15),
-  (3, 'Seriez-vous libre pour un café demain?', '2022-04-02', 16);
+
+--RIGHT JOIN: Liste des rendez-vous en cours avec les informations des deux utilisateurs, y compris ceux qui n'ont pas de rendez-vous en cours :
+SELECT e.id_ad, p1.pid AS pid1, p1.nom AS nom1, p1.prenom AS prenom1, p2.pid AS pid2, p2.nom AS nom2, p2.prenom AS prenom2, e.lieuRDV, e.dateRDV
+FROM profil p1
+JOIN En_cours e ON p1.pid = e.pid1
+RIGHT JOIN profil p2 ON e.pid2 = p2.pid;
+
+
+--INNER et LEFT: Liste des utilisateurs, leurs albums, et les photos partagées, même s'ils n'ont pas d'albums ou de photos :
+SELECT p.pid, p.nom, p.prenom, a.album_id, a.album_date, ph.ph_id, ph.share_date
+FROM profil p
+LEFT JOIN Album a ON p.pid = a.pid
+LEFT JOIN Photo ph ON a.album_id = ph.album_id;
+
+
+--FULL OUTER JOIN:
+SELECT p.pid, p.nom, p.prenom, a.adr_id, a.pays, a.ville, a.rue, a.codepostal, a.num
+FROM profil p
+FULL OUTER JOIN Adresse a ON p.pid = a.adr_id;
+
+
+--UNION :Liste de tous les rendez-vous (terminés et en cours)
+SELECT pid1, pid2, lieuRDV, dateRDV
+FROM En_cours
+UNION ALL
+SELECT pid1, pid2, lieuRDV, dateRDV
+FROM Termines
+ORDER BY dateRDV;
+
+--Vue : liste des rendez-vous à venir par utilisateur
+ 
+CREATE VIEW rdv_a_venir AS
+SELECT p1.nom AS nom1, p1.prenom AS prenom1, p2.nom AS nom2, p2.prenom AS prenom2, rdv.lieuRDV, rdv.dateRDV
+FROM rdv
+JOIN profil p1 ON rdv.pid1 = p1.pid
+JOIN profil p2 ON rdv.pid2 = p2.pid
+WHERE rdv.dateRDV >= CURRENT_DATE;
+
+--Vue : nombre total de rendez-vous par utilisateur
+
+CREATE VIEW total_rdv_par_utilisateur AS
+SELECT pid, COUNT(*) AS total_rdv
+FROM (
+    SELECT pid1 AS pid FROM rdv
+    UNION ALL
+    SELECT pid2 AS pid FROM rdv
+) AS rdv_union
+GROUP BY pid;
+
+
+
+--vérifier l'âge avant d'insérer ou de mettre à jour un profil
+
+CREATE OR REPLACE FUNCTION check_age() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.age < 18 THEN
+    RAISE EXCEPTION 'L''âge doit être supérieur ou égal à 18';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_age_trigger
+  BEFORE INSERT OR UPDATE ON profil
+  FOR EACH ROW
+  EXECUTE FUNCTION check_age();
+
+--ajouter un timestamp lors de l'insertion d'un message dans la table texto
+ 
+CREATE OR REPLACE FUNCTION add_timestamp() RETURNS TRIGGER AS $$
+BEGIN
+  NEW.heure = EXTRACT(HOUR FROM CURRENT_TIME);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER add_timestamp_trigger
+  BEFORE INSERT ON texto
+  FOR EACH ROW
+  EXECUTE FUNCTION add_timestamp();
   
-  INSERT INTO Preference (pid, P1, P2, P3) VALUES
-(1, 'Cinéma', 'Sport', 'Voyage'),
-(2, 'Sport', 'Musique', 'Cuisine'),
-(3, 'Sport', 'Lecture', 'Cuisine'),
-(4, 'Voyage', 'Cuisine', 'Musique');
+--marquer les rendez-vous comme terminés
+ 
+CREATE OR REPLACE FUNCTION check_rdv_termines() RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.dateRDV < CURRENT_DATE THEN
+    INSERT INTO Termines (pid1, pid2, lieuRDV, dateRDV, fin) VALUES (NEW.pid1, NEW.pid2, NEW.lieuRDV, NEW.dateRDV, CURRENT_DATE);
+    DELETE FROM En_cours WHERE id_ad = NEW.id_ad;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-INSERT INTO En_cours (pid1, pid2, lieuRDV, dateRDV) VALUES
-(1, 2, 'Café de la Place', '2023-04-05'),
-(2, 3, 'Bar du Coin', '2023-04-06'),
-(3, 4, 'Restaurant Le Gourmet', '2023-04-07'),
-(4, 5, 'Chez Léa', '2023-04-10'),
-(5, 6, 'Biergarten', '2023-04-09');
+CREATE TRIGGER check_rdv_termines_trigger
+  AFTER INSERT OR UPDATE ON En_cours
+  FOR EACH ROW
+  EXECUTE FUNCTION check_rdv_termines();
+  
+--Ajouter une nouvelle ligne dans la table Facture lorsqu'un profil Premium est créé:
 
-INSERT INTO Termines (pid1, pid2, lieuRDV, dateRDV, fin) VALUES
-(6, 1, 'Trattoria', '2023-03-10', '2023-03-10'),
-(1, 3, 'Pizzeria', '2023-03-11', '2023-03-11'),
-(2, 4, 'Sushi Bar', '2023-03-12', '2023-03-12'),
-(3, 5, 'Boulangerie', '2023-03-13', '2023-03-13'),
-(4, 6, 'Brasserie', '2023-03-14', '2023-03-14');
+CREATE OR REPLACE FUNCTION create_facture()
+  RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO Facture (date_fac) VALUES (NEW.fin_abonnement);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_facture_trigger
+  AFTER INSERT ON Premium
+  FOR EACH ROW
+  EXECUTE FUNCTION create_facture();
+  
+-- mettre à jour le age d'un profil après une modification
+CREATE OR REPLACE FUNCTION update_age()
+  RETURNS TRIGGER AS $$
+BEGIN
+  NEW.age = EXTRACT(YEAR FROM age(NEW.date_naissance));
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE profil ADD COLUMN date_naissance DATE;
+
+CREATE TRIGGER update_age_trigger
+  BEFORE INSERT OR UPDATE OF date_naissance ON profil
+  FOR EACH ROW
+  EXECUTE FUNCTION update_age();
